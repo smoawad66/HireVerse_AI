@@ -698,7 +698,7 @@ def monitor_distance(cap):
     """
     Monitors the user's distance from the camera and centering as a setup phase.
 
-    Args:
+    Args
         cap: OpenCV VideoCapture object.
 
     Returns:
@@ -814,8 +814,8 @@ def monitor_distance(cap):
 
 
 
-def test_interview(frame, posture_history, interview_id): 
-    
+def test_interview(frame, posture_history, interview_id):
+        
     fps_filter = 0.0
     start_time = time.time()
     frame_count = 0
@@ -851,8 +851,8 @@ def test_interview(frame, posture_history, interview_id):
         image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         image_rgb.flags.writeable = False
 
-        face_results = face_mesh_model.process(image_rgb)
-        pose_results = pose_model.process(image_rgb)
+        face_results = face_mesh.process(image_rgb)
+        pose_results = pose.process(image_rgb)
 
         image_rgb.flags.writeable = True
 
@@ -922,6 +922,130 @@ def test_interview(frame, posture_history, interview_id):
     logging.info(f"Analysis completed. Duration: {duration:.2f}s, Frames: {frame_count}, Avg FPS: {avg_fps:.2f}")
     logging.info("MediaPipe resources released for analysis.")
     logging.info("Analysis window closed.")
+
+
+
+
+
+
+# def test_interview(video_path, interview_id):
+
+
+#     cap = cv2.VideoCapture(video_path)
+
+#     if not cap.isOpened():
+#         logging.error(f"Could not open video: {video_path}")
+#         return
+
+#     fps_filter = 0.0
+#     start_time = time.time()
+#     frame_count = 0
+#     posture_history = deque(maxlen=POSTURE_SMOOTHING)
+
+
+#     head_pose_thresholds = {
+#         'y_left_right': HEAD_POSE_FORWARD_THRESHOLD_Y,
+#         'x_down': HEAD_POSE_FORWARD_THRESHOLD_X,
+#         'x_up': HEAD_POSE_FORWARD_THRESHOLD_X
+#     }
+#     posture_threshold_params = {
+#         'shoulder_diff': SHOULDER_DIFF_THRESHOLD,
+#         'head_distance': HEAD_DISTANCE_THRESHOLD,
+#     }
+#     confidence_weight_params = {
+#         'posture': POSTURE_CONFIDENCE_WEIGHT,
+#         'head_pose': HEAD_POSE_CONFIDENCE_WEIGHT
+#     }
+#     posture_weight_params_dict = {'posture': POSTURE_WEIGHTS}
+
+#     while cap.isOpened():
+#         loop_start_time = time.time()
+#         success, frame = cap.read()
+
+#         if not success:
+#             break
+
+#         try:
+#             frame = cv2.resize(frame, (FRAME_WIDTH, FRAME_HEIGHT))
+#             frame = cv2.flip(frame, 1)
+
+#             height, width = frame.shape[:2]
+#             frame_dims = (width, height)
+#             frame_count += 1
+
+#             image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#             image_rgb.flags.writeable = False
+
+#             face_results = face_mesh_model.process(image_rgb)
+#             pose_results = pose_model.process(image_rgb)
+
+#             image_rgb.flags.writeable = True
+
+#             metrics = _initialize_metrics()
+
+#             p1 = p2 = None
+#             if face_results and face_results.multi_face_landmarks:
+#                 metrics['head_pose'], metrics['head_pose_confidence'], p1, p2 = _analyze_head_pose(
+#                     face_results.multi_face_landmarks[0],
+#                     frame_dims,
+#                     CAM_MATRIX,
+#                     DIST_MATRIX,
+#                     LANDMARK_INDICES_HEAD_POSE,
+#                     head_pose_thresholds
+#                 )
+
+#             shoulder_line_pts = None
+#             shoulder_color = (0, 0, 255)
+
+#             if pose_results and pose_results.pose_landmarks:
+#                 (metrics['posture_score'], metrics['posture_confidence'],
+#                  metrics['posture_feedback'], shoulder_line_pts, shoulder_color,
+#                  posture_history) = _analyze_posture(
+#                     pose_results.pose_landmarks,
+#                     frame_dims,
+#                     posture_history,
+#                     POSTURE_SMOOTHING,
+#                     posture_threshold_params,
+#                     posture_weight_params_dict
+#                 )
+#             else:
+#                 posture_history.clear()
+
+#             metrics['overall_confidence'] = _calculate_overall_confidence(
+#                 metrics['posture_confidence'],
+#                 metrics['head_pose_confidence'],
+#                 confidence_weight_params
+#             )
+
+#             fps_filter, _ = _update_fps(loop_start_time, fps_filter)
+#             metrics['fps'] = fps_filter
+
+#             csv_path = f"{BASE_PATH}/SoftSkills/logs/analysis_metrics_{interview_id}.csv"
+#             log_metrics(csv_path, metrics)
+
+#             frame = _draw_overlay_analysis(frame, metrics, p1, p2, shoulder_line_pts, shoulder_color)
+
+#             # cv2.imshow("Interview Presence Analyzer", frame)
+
+#             key = cv2.waitKey(10) & 0xFF
+#             if key == ord('q') or key == 27:
+#                 break
+#             elif key == ord('r'):
+#                 posture_history.clear()
+#                 logging.info("Posture history reset by user.")
+
+#         except Exception as e:
+#             logging.error(f"Frame processing error during analysis: {e}", exc_info=True)
+
+#     duration = time.time() - start_time
+#     avg_fps = frame_count / duration if duration > 0 else 0
+
+#     cap.release()
+#     cv2.destroyAllWindows()
+
+#     logging.info(f"Analysis completed. Duration: {duration:.2f}s, Frames: {frame_count}, Avg FPS: {avg_fps:.2f}")
+#     logging.info("MediaPipe resources released for analysis.")
+#     logging.info("Analysis window closed.")
 
 
 
