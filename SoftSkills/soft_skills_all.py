@@ -830,6 +830,20 @@ def draw_overlay(frame: np.ndarray, metrics: Dict[str, Any], colors: Dict[str, T
 
 
 
+parameters_file_path = f'{BASE_PATH}/SoftSkills/interviews_parameters.json'
+
+def get_interview_parameters(interview_id):
+    with open(parameters_file_path, 'r') as file:
+        data = json.load(file)
+        
+    interviewee_params = data.get(interview_id, {})
+
+    gaze_thresholds = interviewee_params.get("dynamic_gaze_thresholds", {})
+    reference_iod_store = interviewee_params.get("reference_iod_store", {})
+    focal_length = interviewee_params.get("calibrated_focal_length", 0.0)
+
+    return gaze_thresholds, reference_iod_store, focal_length
+
 
 def run_main_analysis(cap: cv2.VideoCapture, face_mesh: mp.solutions.face_mesh.FaceMesh, pose: mp.solutions.pose.Pose,
                       dynamic_thresholds: Dict[str, float], focal_length: Optional[float],
@@ -1554,4 +1568,4 @@ def interview_test(video_path, interview_id):
 
         
 if __name__ == '__main__':
-    pass
+    interview_test("record.avi", "1")

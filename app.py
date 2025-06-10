@@ -1,10 +1,12 @@
 from flask_socketio import SocketIO, emit
 from flask import Flask, jsonify, request
-from CVFiltration.cv_filtration import evaluate_cvs
-from SoftSkills.pre_interview import pre_interview_test, save_parameters
-from Recommendation.recommend import *
-from SoftSkills.helpers import bin2img, init_interview, img2bin, get_default_interview_state
 from collections import defaultdict
+from SoftSkills.pre_interview import pre_interview_test, save_parameters
+from SoftSkills.soft_skills_all import interview_test
+from SoftSkills.helpers import bin2img, init_interview, img2bin, get_default_interview_state
+from CVFiltration.cv_filtration import evaluate_cvs
+from Recommendation.recommend import *
+from TechnicalSkills.technical_skills_analysis import evaluate_applicant_answers
 
 
 
@@ -130,12 +132,31 @@ def filter_cvs():
 
 @app.route('/recommendation', methods=['GET'])
 def recommend_jobs():
+     data = request.get_json()
+     applicants = data['applicants']
+     jobs = data['jobs']
+
+     return jsonify({'recommendations': recommend(applicants, jobs)})
+
+
+# sample request:
+# {
+#     "questions_path": "/interviews/{interview_id}/questions.json",
+#     "answers_paths": ["/interviews/{interview_id}/answers/question-{question_id}.mp4", ]
+# }
+
+@app.route('/answers/evaluation', methods=['GET'])
+def evaluate_answers():
     data = request.get_json()
-    applicants = data['applicants']
-    jobs = data['jobs']
+    questions_path = data['questions_path']
+    answers_paths = data['answers_paths']
 
-    return jsonify({'recommendations': recommend(applicants, jobs)})
+    print(questions_path)
+    print(answers_paths)
 
+    results = evaluate_applicant_answers(questions_path, answers_paths)
+
+    return jsonify({"results": results})
 
 
 @app.route('/', methods=['GET'])
@@ -143,4 +164,8 @@ def test(): return jsonify({'message': 'hello world from Elsayed'})
 
 
 if __name__ == '__main__':
+    job_skills = {
+        "Software Engineer": ["Python"],
+    }
+    # generate_questions(job_skills)
     socketio.run(app, debug=True, host='0.0.0.0', port=5000)

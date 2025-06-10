@@ -1,0 +1,56 @@
+[
+    {
+        "question": "What is the difference between the 'is' and '==' operators in Python?",
+        "question_metadata": {
+            "skill": "Python",
+            "difficulty": "Medium",
+            "experience_level": "Mid-level",
+            "job_role": "Software Engineer"
+        },
+        "applicant_answer": "The 'is' operator is for identity, it checks if two variables point to the same object in memory. In contrast, the '==' operator is for equality, meaning it checks if two objects have the same value. For instance, two separate lists with identical contents are equal (== is True) but are not the same object (is is False).",
+        "scores": {
+            "keyword": 1.0,
+            "component": 0.895,
+            "criteria": 0.839,
+            "overall": 0.911
+        },
+        "matched_keywords": [
+            "equality",
+            "identity",
+            "operator"
+        ],
+        "assessment": "Excellent",
+        "thresholds_used": {
+            "excellent": 0.85,
+            "good": 0.7,
+            "fair": 0.5
+        }
+    },
+    {
+        "question": "How does Python handle memory management, and what is the role of the garbage collector?",
+        "question_metadata": {
+            "skill": "Python",
+            "difficulty": "Hard",
+            "experience_level": "Mid-level",
+            "job_role": "Software Engineer"
+        },
+        "applicant_answer": "Python's memory management is done on a private heap. It uses reference counting to track object references. When an object's reference count is zero, it gets deallocated. There's also a garbage collector that handles cyclic references which reference counting alone cannot solve.",
+        "scores": {
+            "keyword": 1.0,
+            "component": 0.803,
+            "criteria": 0.832,
+            "overall": 0.878
+        },
+        "matched_keywords": [
+            "garbage collector",
+            "reference counting",
+            "memory management"
+        ],
+        "assessment": "Good",
+        "thresholds_used": {
+            "excellent": 0.9,
+            "good": 0.75,
+            "fair": 0.55
+        }
+    }
+]
