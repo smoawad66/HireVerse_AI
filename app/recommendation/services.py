@@ -1,11 +1,13 @@
 from sklearn.metrics.pairwise import cosine_similarity
-from globals import BASE_PATH
-import joblib
+import joblib, os
 
 
-model = joblib.load(f"{BASE_PATH}/Recommendation/model/model.pkl")
-vectorizer = joblib.load(f"{BASE_PATH}/Recommendation/model/vectorizer.pkl")
-le = joblib.load(f"{BASE_PATH}/Recommendation/model/label_encoder.pkl")
+MODELS_DIR = os.path.dirname(__file__) + '/../shared/models'
+
+
+model = joblib.load(os.path.join(MODELS_DIR, 'recommend_model.pkl'))
+vectorizer = joblib.load(os.path.join(MODELS_DIR, 'recommend_vectorizer.pkl'))
+le = joblib.load(os.path.join(MODELS_DIR, 'recommend_label_encoder.pkl'))
 
 
 def recommend(applicants, jobs):

@@ -1,22 +1,12 @@
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-from globals import BASE_PATH
-import spacy, pickle
+import spacy
 
 
-model_path = f"{BASE_PATH}/CVFiltration/models/flan-t5-large-8bit"
 
-tokenizer = AutoTokenizer.from_pretrained(model_path)
-model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
-
-
-with open(f"{BASE_PATH}/CVFiltration/models/bert_model.pkl", 'rb') as f:
-    match_model=pickle.load(f)
-
-if not hasattr(match_model.tokenizer, 'pad_token') or match_model.tokenizer.pad_token is None:
-    match_model.tokenizer.pad_token = '[PAD]'
+# if not hasattr(bert_model.tokenizer, 'pad_token') or bert_model.tokenizer.pad_token is None:
+#     bert_model.tokenizer.pad_token = '[PAD]'
     
-if not hasattr(match_model.tokenizer, 'pad_token_id') or match_model.tokenizer.pad_token_id is None:
-    match_model.tokenizer.pad_token_id = 0
+# if not hasattr(bert_model.tokenizer, 'pad_token_id') or bert_model.tokenizer.pad_token_id is None:
+#     bert_model.tokenizer.pad_token_id = 0
 
 
 questions3 = {

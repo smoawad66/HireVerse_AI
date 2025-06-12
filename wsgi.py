@@ -1,0 +1,11 @@
+from app import create_app, socketio
+from flask import jsonify
+
+app = create_app('app.config.DevelopmentConfig')
+
+@app.route('/test', methods=['GET'])
+def test():
+    return jsonify({'message':'hello world'}), 200
+
+if __name__ == '__main__':
+    socketio.run(app, host='0.0.0.0', port=5000)

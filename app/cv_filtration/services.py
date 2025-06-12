@@ -1,21 +1,18 @@
+from ..shared.models import bert_model, pipeline_info, pipeline_skills
 from langchain_huggingface import HuggingFacePipeline
 from sentence_transformers import util
-from CVFiltration.validator import validated_data
-from CVFiltration.constants import *
-from transformers import pipeline
-from flask import json
+from .validator import validated_data
+from .constants import *
 import fitz, re
 
 
+
 def evaluate_cvs():
-    
     cv_files, job_description, required_skills = validated_data()
     cv_scores = []
     
     if not required_skills:
         required_skills = extract_skills(job_description)
-
-    # print(required_skills)
      
     for cv_file in cv_files:
         resume_text = extract_text_from_pdf(cv_file)
@@ -38,22 +35,6 @@ def evaluate_cvs():
         applicant_data['match_percentage'] = similarity_score
 
         cv_scores.append(applicant_data['match_percentage'])
-
-        # temp = {
-        #     "jobDescription": job_description,
-        #     "resumeText": resume_text,
-        #     "requiredSkills": required_skills,
-        #     "applicantSkills": applicant_data['skills'],
-        #     "applicantScore": applicant_data['match_percentage'],
-        # }
-
-        # if applicant_data['match_percentage'] < 50.0:
-        #    with open("bad.json", "a") as file:
-        #        json.dump(temp, file, indent=4)
-        # else:
-        #     with open("good.json", "a") as file:
-        #        json.dump(temp, file, indent=4)
-
         
     return cv_scores
 
@@ -123,17 +104,7 @@ def extract_academic_info(text):
     
 
 def extract_information(resume_text, question=""):
-    text_generation_pipeline = pipeline(
-        "text2text-generation",
-        model=model,
-        tokenizer=tokenizer,
-        max_length=256,
-        do_sample=True,
-        temperature=0.2,
-
-
-    )
-    llm = HuggingFacePipeline(pipeline=text_generation_pipeline)
+    llm = HuggingFacePipeline(pipeline=pipeline_info)
 
     prompt =f"""You are an intelligent assistant designed to extract information from resumes.
     Below is a specific question related to a candidate's resume.
@@ -146,24 +117,13 @@ def extract_information(resume_text, question=""):
         {question}
         If the answer cannot be found, respond with "Not found."""
     
-
-    return llm(prompt)
+    return llm.invoke(prompt)
 
 
 def extract_skills(text):
 
     try:
-        text_generation_pipeline = pipeline(
-            "text2text-generation",
-            model=model,
-            tokenizer=tokenizer,
-            max_length=256,
-            do_sample=True,
-            temperature=0.1,
-            top_p=0.9
-        )
-
-        llm = HuggingFacePipeline(pipeline=text_generation_pipeline)
+        llm = HuggingFacePipeline(pipeline=pipeline_skills)
         
         prompt = f"""  You are an advanced AI assistant specialized in analyzing and extracting valuable information from resume text. Your task is to extract and list all the skills mentioned in the provided text. Focus solely on identifying skills, including technical skills, soft skills. 
         
@@ -172,7 +132,7 @@ def extract_skills(text):
         """
 
         # Call the model with the prompt
-        response = llm(prompt)
+        response = llm.invoke(prompt)
 
         if isinstance(response, str):
             return response
@@ -253,7 +213,7 @@ def bert_similarity(text1, text2):
     filter_skills = process_text(text2)
     
     # Encode the filtered texts to get embeddings
-    embeddings = match_model.encode([' '.join(filter_require), ' '.join(filter_skills)], convert_to_tensor=True)
+    embeddings = bert_model.encode([' '.join(filter_require), ' '.join(filter_skills)], convert_to_tensor=True)
     
     # Calculate similarity using PyTorch's cosine similarity
     similarity = util.pytorch_cos_sim(embeddings[0], embeddings[1])
