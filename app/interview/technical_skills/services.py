@@ -1,4 +1,4 @@
-from .helpers import load_questions, download_videos, recognize_speech
+from .helpers import load_questions, recognize_speech
 from .classes import OptimizedAnswerEvaluator
 import logging
 
@@ -6,7 +6,7 @@ import logging
 evaluator = OptimizedAnswerEvaluator()
 
 
-def evaluate_applicant_answers(questions_path, answers_paths):
+def evaluate_technical_skills(questions_path, answers_paths):
     
     try:
         questions = load_questions(questions_path)
@@ -16,9 +16,7 @@ def evaluate_applicant_answers(questions_path, answers_paths):
             return
         
         
-        local_paths = download_videos(answers_paths)
-
-        answers = [recognize_speech(video_path) for video_path in local_paths]
+        answers = [recognize_speech(video_path) for video_path in answers_paths]
         
         # answers = [
         #     "is operator is used for checking the identity it checks both variables are pointing to the same object in memory but equal equal operator is used for equality if two variables have the same value",
@@ -29,9 +27,9 @@ def evaluate_applicant_answers(questions_path, answers_paths):
 
 
         if len(questions) > len(answers):
+            dif = len(questions) - len(answers)
             print(f"Warning: Only {len(answers)} sample answers provided, but {len(questions)} questions loaded for evaluation.")
-            questions = questions[:len(answers)]
-
+            answers.extend([''] * dif)
 
         results = evaluator.evaluate_batch(questions, answers)
 

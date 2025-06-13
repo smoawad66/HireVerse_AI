@@ -7,7 +7,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 import string
-from ..shared.models import bert_model
+from ...shared.models import bert_model
 from .helpers import lazy_load_nltk_resources, _nltk_resources
 
 
@@ -260,13 +260,13 @@ class OptimizedAnswerEvaluator:
             }
             weights = self._get_weight_profile(question_data)
             overall_score = self._calculate_weighted_score(scores, weights)
-            scores["overall"] = float(overall_score)
+            scores["overall"] = float(overall_score) * 100
             thresholds = self._get_adaptive_thresholds(question_data)
             assessment = self._get_qualitative_assessment(overall_score, thresholds)
             return {
                 "question": question_data.get("question", ""),
                 "applicant_answer": applicant_answer,
-                "scores": {k: round(v, 3) for k, v in scores.items()},
+                "scores": {k: round(v, 2) for k, v in scores.items()},
                 "question_metadata": {
                     "skill": question_data.get("skill", ""),
                     "difficulty": question_data.get("difficulty_level", ""),

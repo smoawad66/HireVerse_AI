@@ -4,10 +4,9 @@ import json
 import numpy as np
 from typing import List, Dict
 from dotenv import load_dotenv
-import os, boto3, time
+import os, time
 import requests
 
-# logging.basicKConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 BASE_DIR = os.path.dirname(__file__)
 SPEECH_RECOGNITION_HOST = "advanced-speech-to-text-fast-accurate-and-ai-powered.p.rapidapi.com"
@@ -15,39 +14,11 @@ SPEECH_RECOGNITION_API_KEY = "a7706886c9mshca04b4e277c7245p1ba4b3jsn8a50361f0d73
 BUCKET_NAME = 'myawshierbucket'
 
 
-load_dotenv()
-s3 = boto3.client('s3')
-
-
-def create_folder(folder_name):
-    folder_path = os.path.join(BASE_DIR, folder_name)
-    if not os.path.exists(folder_path):
-        os.makedirs(folder_path, exist_ok=True)
-    return folder_path
-
-
-def download_videos(keys): 
-    videos_folder = create_folder('videos')
-
-    paths = []
-    for key in keys:
-        file_name = key.split('/')[-1]
-        path = os.path.join(videos_folder, file_name)
-        s3.download_file(BUCKET_NAME, key, path)
-        paths.append(path)
-    return paths
-
-
-def download_questions_file(key):
-    questions_folder = create_folder('questions')
-    
-    path = os.path.join(questions_folder, f'questions-{int(time.time())}.json')
-    s3.download_file(BUCKET_NAME, key, path)
-    return path
-
 
 def convert_video_to_audio(video_path):
-    audios_folder = create_folder('audios')
+    audios_folder = os.path.join(BASE_DIR, 'audios')
+    if not os.path.exists(audios_folder):
+        os.makedirs(audios_folder, exist_ok=True)
 
     intended_audio_path = os.path.join(audios_folder, f'q-{int(time.time())}.mp3')
 
@@ -58,13 +29,15 @@ def convert_video_to_audio(video_path):
     else:
         print(f"File '{intended_audio_path}' was not created.")
 
-    os.remove(video_path)
+    # os.remove(video_path)
 
     return intended_audio_path
 
 
-
-def recognize_speech(video_path: str):
+def recognize_speech(video_path):
+    if video_path is None:
+        return ''
+    
     audio_path = convert_video_to_audio(video_path)
 
     if not os.path.exists(audio_path):
@@ -117,23 +90,19 @@ def recognize_speech(video_path: str):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
     
-    os.remove(audio_path)
+    # os.remove(audio_path)
 
     return transcribed_text.strip()
 
 
 def load_questions(file_path) -> List[Dict]:
-    """Loads questions from a JSON file."""
-    file_path = download_questions_file(file_path)
-    # file_path = os.path.join(BASE_DIR, file_path)
-
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             questions = json.load(f)
         if not isinstance(questions, list):
             raise ValueError("JSON file must contain a list of questions")
         
-        os.remove(file_path)
+        # os.remove(file_path)
 
         return questions
     except FileNotFoundError:
