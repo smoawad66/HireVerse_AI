@@ -207,7 +207,7 @@ class OptimizedAnswerEvaluator:
 
     def _get_adaptive_thresholds(self, question_data: Dict) -> ThresholdConfig:
         """Calculates adaptive scoring thresholds."""
-        difficulty = question_data.get("difficulty_level", "Medium")
+        difficulty = question_data.get("difficulty", "Medium")
         experience = question_data.get("experience_level", "Mid-level")
         base_thresholds = self.config.difficulty_thresholds.get(difficulty, self.config.difficulty_thresholds["Medium"])
         modifier = self.config.experience_modifiers.get(experience, 1.0)
@@ -269,7 +269,7 @@ class OptimizedAnswerEvaluator:
                 "scores": {k: round(v, 2) for k, v in scores.items()},
                 "question_metadata": {
                     "skill": question_data.get("skill", ""),
-                    "difficulty": question_data.get("difficulty_level", ""),
+                    "difficulty": question_data.get("difficulty", ""),
                     "experience_level": question_data.get("experience_level", ""),
                     "job_role": question_data.get("job_role", "")
                 },
@@ -292,6 +292,9 @@ class OptimizedAnswerEvaluator:
             "applicant_answer": answer,
             "error": error,
             "scores": {"overall": 0.0},
+            "question_metadata": {
+                "skill": question_data.get("skill", ""),
+            },
             "assessment": "Error"
         }
 

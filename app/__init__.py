@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
+from .interview.dash import create_dash_app
 
 def create_app(config_object=None):
     app = Flask(__name__)
@@ -17,5 +18,6 @@ def create_app(config_object=None):
     app.register_blueprint(rec_bp, url_prefix='/api')
     app.register_blueprint(intr_bp, url_prefix='/api/interview')
 
+    create_dash_app(app)
 
     return app
