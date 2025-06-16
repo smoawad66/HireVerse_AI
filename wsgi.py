@@ -6,6 +6,7 @@ app = create_app('app.config.DevelopmentConfig')
 @app.route('/test', methods=['GET'])
 def test():
     return jsonify({'message':'hello world'}), 200
+
 #@app.route('/interview')
 
 if __name__ == '__main__':

@@ -90,7 +90,7 @@ def recognize_speech(video_path):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
     
-    # os.remove(audio_path)
+    os.remove(audio_path)
 
     return transcribed_text.strip()
 

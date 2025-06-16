@@ -1,6 +1,7 @@
 from .helpers import load_questions, recognize_speech, json_numpy_serializer
 from .classes import OptimizedAnswerEvaluator
-import logging
+import logging, json, os
+
 
 
 evaluator = OptimizedAnswerEvaluator()
@@ -33,13 +34,14 @@ def evaluate_technical_skills(questions_path, answers_paths, interview_id):
         results = evaluator.evaluate_batch(questions, answers)
 
         #push file to s3
-        import json, os
         output_file_name = os.path.dirname(__file__) + f'/analysis_metrics/interview-{interview_id}.json'
         try:
             with open(output_file_name, 'w', encoding='utf-8') as f:
                 json.dump(results, f, indent=4, default=json_numpy_serializer)
         except Exception as e:
             logging.error(f"Error saving evaluation results: {e}", exc_info=True)
+        
+        os.remove(questions_path)
 
         return results
 

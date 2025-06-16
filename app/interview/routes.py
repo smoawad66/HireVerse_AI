@@ -16,11 +16,11 @@ def interview_analysis_task(data):
     callback_url = data['callbackUrl']
 
     local_questions_path =  download_questions_file(questions_path)
-    # local_answers_paths = download_applicant_answers(answers_paths)
-    import os
-    lo = os.path.dirname(__file__) + '/technical_skills/videos'
-    k = os.listdir(lo)
-    local_answers_paths = [os.path.join(lo, i) for i in k]
+    local_answers_paths = download_applicant_answers(answers_paths)
+    #import os
+    #lo = os.path.dirname(__file__) + '/technical_skills/videos'
+    #k = os.listdir(lo)
+    #local_answers_paths = [os.path.join(lo, i) for i in k]
 
     technical_results = evaluate_technical_skills(local_questions_path, local_answers_paths, interview_id)
     soft_overall_score = evaluate_soft_skills(local_answers_paths, interview_id)

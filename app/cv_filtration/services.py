@@ -1,21 +1,21 @@
 from ..shared.models import bert_model, pipeline_info, pipeline_skills
 from langchain_huggingface import HuggingFacePipeline
 from sentence_transformers import util
-from .validator import validated_data
+from .helpers import validated_data
 from .constants import *
 import fitz, re
 
 
 
 def evaluate_cvs():
-    cv_files, job_description, required_skills = validated_data()
+    cv_paths, job_description, required_skills = validated_data()
     cv_scores = []
     
     if not required_skills:
         required_skills = extract_skills(job_description)
      
-    for cv_file in cv_files:
-        resume_text = extract_text_from_pdf(cv_file)
+    for cv_path in cv_paths:
+        resume_text = extract_text_from_pdf(cv_path)
         personal_text, remaining_text = extract_and_concatenate_profile(resume_text)
         academic_info, remaining_text = extract_academic_info(remaining_text)
 
@@ -39,10 +39,10 @@ def evaluate_cvs():
     return cv_scores
 
 
-def extract_text_from_pdf(pdf_file):
+def extract_text_from_pdf(pdf_path):
 
-    # pdf_document = fitz.open(pdf_path)
-    pdf_document = fitz.open(stream=pdf_file.read(), filetype="pdf")
+    pdf_document = fitz.open(pdf_path)
+    # pdf_document = fitz.open(stream=pdf_file.read(), filetype="pdf")
 
     extracted_text = ""
 
